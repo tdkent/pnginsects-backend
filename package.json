@@ -1,0 +1,17 @@
+{
+  "name": "pnginsects-backend",
+  "version": "1.0.0",
+  "description": "Node backend for PNG Insects web application",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Tim Kent",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.18.2"
+  },
+  "devDependencies": {
+    "typescript": "^5.1.6"
+  }
+}
