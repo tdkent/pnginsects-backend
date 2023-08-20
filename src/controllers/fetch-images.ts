@@ -25,7 +25,7 @@ const fetchImages: RequestHandler<{ name: string }> = async (req, res, next) => 
         type: "upload",
         prefix: `${name}`,
         resource_type: "image",
-        max_results: 2,
+        max_results: 100,
       })
       .then((res) => res);
     res.json(images);

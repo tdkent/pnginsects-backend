@@ -1,6 +1,5 @@
-import { Router, Request, Response, NextFunction, RequestHandler } from "express";
+import { Router } from "express";
 import { param } from "express-validator";
-import cloudinary from "cloudinary";
 
 import fetchImages from "../controllers/fetch-images";
 import { AcceptedParams, Errors } from "../models";

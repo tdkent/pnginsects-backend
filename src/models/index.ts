@@ -16,6 +16,7 @@ export enum AcceptedParams {
 }
 
 export enum Errors {
+  notfoundError = "That route does not exist",
   requestError = "Received invalid request parameters",
   serverError = "An unknown error occurred while processing the request.",
 }
