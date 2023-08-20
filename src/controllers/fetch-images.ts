@@ -1,17 +1,41 @@
 import { RequestHandler } from "express";
 import { validationResult } from "express-validator";
+import cloudinary from "cloudinary";
 
-const fetchImages: RequestHandler<{ name: string }> = (req, res, next) => {
+import { cloudinaryName, cloudinaryKey, cloudinarySecret } from "../config/config";
+
+import { Errors } from "../models";
+
+cloudinary.v2.config({
+  cloud_name: cloudinaryName,
+  api_key: cloudinaryKey,
+  api_secret: cloudinarySecret,
+  secure: true,
+});
+
+const fetchImages: RequestHandler<{ name: string }> = async (req, res, next) => {
   const { name } = req.params;
-  console.log("🚀 ~ file: fetch-images.ts:6 ~ name:", name);
   try {
     const errors = validationResult(req);
-    console.log("🚀 ~ file: fetch-images.ts:8 ~ errors:", errors);
-    // if (!errors.isEmpty()) {
-    //   return res.status(422).json({ errors: errors.array() });
-    // }
-    res.json({ message: "hello world" });
-  } catch (error) {}
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+    const images = await cloudinary.v2.api
+      .resources({
+        type: "upload",
+        prefix: `${name}`,
+        resource_type: "image",
+        max_results: 2,
+      })
+      .then((res) => res);
+    res.json(images);
+  } catch (error) {
+    console.log(error);
+    res.status(500);
+    return next({
+      message: Errors.serverError,
+    });
+  }
 };
 
 export default fetchImages;
