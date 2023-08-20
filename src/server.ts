@@ -6,7 +6,7 @@ const app = express();
 import { port } from "./config/config";
 import route from "./routes";
 
-app.use("/test", route);
+app.use("/", route);
 
 // error handling
 app.use((req, res, next) => {
