@@ -1,8 +1,8 @@
 import { Router } from "express";
 import { param } from "express-validator";
 
-import fetchImages from "../controllers/fetch-images";
-import { AcceptedParams, Errors } from "../models";
+import fetchImages from "@controllers";
+import { AcceptedParams, Errors } from "@models";
 
 const router = Router();
 

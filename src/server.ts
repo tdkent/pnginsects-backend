@@ -1,8 +1,9 @@
 import express, { Request, Response, NextFunction } from "express";
+import "module-alias/register";
 
-import { port } from "./config/config";
-import route from "./routes";
-import { Errors } from "./models";
+import { port } from "@configs";
+import route from "@routes";
+import { Errors } from "@models";
 
 const app = express();
 

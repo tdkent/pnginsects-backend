@@ -2,7 +2,9 @@ import { RequestHandler } from "express";
 import { validationResult } from "express-validator";
 import cloudinary from "cloudinary";
 
-import { cloudinaryName, cloudinaryKey, cloudinarySecret } from "../config/config";
+import { cloudinaryName, cloudinaryKey, cloudinarySecret } from "@configs";
+import { extractSectionName } from "@utils";
+import { CloudinaryResources } from "@models";
 
 import { Errors } from "../models";
 
@@ -16,11 +18,14 @@ cloudinary.v2.config({
 const fetchImages: RequestHandler<{ name: string }> = async (req, res, next) => {
   const { name } = req.params;
   try {
+    // validation errors
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return res.status(400).json({ errors: errors.array() });
     }
-    const images = await cloudinary.v2.api
+
+    // cloudinary admin api
+    const { resources, rate_limit_remaining }: CloudinaryResources = await cloudinary.v2.api
       .resources({
         type: "upload",
         prefix: `${name}`,
@@ -28,7 +33,22 @@ const fetchImages: RequestHandler<{ name: string }> = async (req, res, next) => 
         max_results: 100,
       })
       .then((res) => res);
-    res.json(images);
+
+    console.log("rate limit remaining: ", rate_limit_remaining);
+
+    // extract unique section names
+    const folders = resources.map(({ folder }) => extractSectionName(folder));
+    const sections: string[] = [...new Set(folders)];
+
+    // create data array
+    const filteredData = sections.map((section) => {
+      return {
+        sectionName: section,
+        images: resources.filter(({ folder }) => extractSectionName(folder) === section),
+      };
+    });
+
+    res.json(filteredData);
   } catch (error) {
     console.log(error);
     res.status(500);
