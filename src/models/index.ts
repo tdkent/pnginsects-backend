@@ -15,7 +15,7 @@ export enum AcceptedParams {
   trichoptera = "trichoptera",
 }
 
-interface CloudinaryResource {
+export interface CloudinaryResource {
   asset_id: string;
   public_id: string;
   format: string;

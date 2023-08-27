@@ -3,7 +3,7 @@ import { validationResult } from "express-validator";
 import cloudinary from "cloudinary";
 
 import { cloudinaryName, cloudinaryKey, cloudinarySecret } from "@configs";
-import { extractSectionName } from "@utils";
+import { extractSectionName, extractCaptions } from "@utils";
 import { CloudinaryResources } from "@models";
 
 import { Errors } from "../models";
@@ -40,11 +40,14 @@ const fetchImages: RequestHandler<{ name: string }> = async (req, res, next) => 
     const folders = resources.map(({ folder }) => extractSectionName(folder));
     const sections: string[] = [...new Set(folders)];
 
+    // extract sections
+    const addCaptions = extractCaptions(resources);
+
     // create data array
     const filteredData = sections.map((section) => {
       return {
         sectionName: section,
-        images: resources.filter(({ folder }) => extractSectionName(folder) === section),
+        images: addCaptions.filter(({ folder }) => extractSectionName(folder) === section),
       };
     });
 
