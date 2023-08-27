@@ -51,7 +51,10 @@ const fetchImages: RequestHandler<{ name: string }> = async (req, res, next) => 
       };
     });
 
-    res.json(filteredData);
+    res.json({
+      sections,
+      resources: filteredData,
+    });
   } catch (error) {
     console.log(error);
     res.status(500);
