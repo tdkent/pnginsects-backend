@@ -30,7 +30,7 @@ const fetchImages: RequestHandler<{ name: string }> = async (req, res, next) => 
         type: "upload",
         prefix: `${name}`,
         resource_type: "image",
-        max_results: 100,
+        max_results: 500,
       })
       .then((res) => res);
 
@@ -39,7 +39,6 @@ const fetchImages: RequestHandler<{ name: string }> = async (req, res, next) => 
     // extract unique section names
     const folders = resources.map(({ folder }) => extractSectionName(folder));
     const sections: string[] = [...new Set(folders)];
-
     // extract sections
     const addCaptions = extractCaptions(resources);
 
