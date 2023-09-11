@@ -5,6 +5,29 @@ export const extractSectionName = (folder: string) => folder.split("/")[1];
 export const extractCaptions = (resources: CloudinaryResource[]) => {
   return resources.map((img) => {
     const fragment = img.public_id.split("/")[2];
-    return fragment[0] === "'" ? { ...img, caption: fragment } : { ...img, caption: null };
+    let filteredString = "";
+
+    // italicize species names
+    // ' (apostrophe) indicates word should be italicized
+    if (fragment[0] === "'") {
+      for (let i = 0; i < fragment.length; i++) {
+        const char = fragment[i];
+        if (char === "'") {
+          if (i === 0 || fragment[i - 1] === " ") filteredString += "<i>";
+          else filteredString += "</i>";
+        } else filteredString += char;
+      }
+
+      // remove auto-generated duplicate naming
+      // ex: (2) or (3)
+      // check if character is '(' and following char is a number
+      const regex = /[(]+[0-9]/g;
+      // if so, remove the last 4 characters from the string
+      // if the copy number is 9 or less, this will remove ' (x)'
+      // if the copy number is 10 or greater, this will remove '(xx)'
+      // in this case we can use trim() to remove the trailing space
+      if (filteredString.match(regex)) filteredString = filteredString.slice(0, -4);
+    }
+    return { ...img, caption: filteredString.trim() };
   });
 };
