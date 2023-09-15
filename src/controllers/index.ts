@@ -35,6 +35,7 @@ const fetchImages: RequestHandler<{ name: string }> = async (req, res, next) => 
       .then((res) => res);
 
     console.log("rate limit remaining: ", rate_limit_remaining);
+    console.log(name, resources.length);
 
     // extract unique section names
     const folders = resources.map(({ folder }) => extractSectionName(folder));
