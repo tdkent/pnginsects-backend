@@ -4,7 +4,7 @@ import cloudinary from "cloudinary";
 
 import { cloudinaryName, cloudinaryKey, cloudinarySecret } from "@configs";
 import { extractSectionName, extractCaptions } from "@utils";
-import { CloudinaryResources } from "@models";
+import { CloudinaryResources, CloudinaryResource } from "@models";
 
 import { Errors } from "../models";
 
@@ -25,17 +25,45 @@ const fetchImages: RequestHandler<{ name: string }> = async (req, res, next) => 
     }
 
     // cloudinary admin api
-    const { resources, rate_limit_remaining }: CloudinaryResources = await cloudinary.v2.api
+    let nextCursorStr: string = "";
+    let numberOfCalls = 0;
+    let resources: CloudinaryResource[] = [];
+
+    // initial fetch request
+    await cloudinary.v2.api
       .resources({
         type: "upload",
         prefix: `${name}`,
         resource_type: "image",
         max_results: 500,
       })
-      .then((res) => res);
+      .then((res: CloudinaryResources) => {
+        res.next_cursor ? (nextCursorStr = res.next_cursor) : (nextCursorStr = "");
+        resources = [...res.resources];
+        numberOfCalls++;
+        console.log(res.rate_limit_remaining);
+        return res;
+      });
 
-    console.log("rate limit remaining: ", rate_limit_remaining);
-    console.log(name, resources.length);
+    // if folder resources > 500, response includes next_cursor prop
+    // repeat fetch request if response includes next_cursor (max 4 calls (2000 total resources))
+    while (nextCursorStr !== "" && numberOfCalls <= 4) {
+      await cloudinary.v2.api
+        .resources({
+          type: "upload",
+          prefix: `${name}`,
+          resource_type: "image",
+          max_results: 500,
+          next_cursor: nextCursorStr,
+        })
+        .then((res: CloudinaryResources) => {
+          res.next_cursor ? (nextCursorStr = res.next_cursor) : (nextCursorStr = "");
+          resources = [...resources, ...res.resources];
+          numberOfCalls++;
+          console.log(res.rate_limit_remaining);
+          return res;
+        });
+    }
 
     // extract unique section names
     const folders = resources.map(({ folder }) => extractSectionName(folder));

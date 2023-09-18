@@ -35,6 +35,7 @@ export interface CloudinaryResources {
   rate_limit_allowed: number;
   rate_limit_reset_at: Date;
   rate_limit_remaining: number;
+  next_cursor: string;
 }
 
 export enum Errors {
