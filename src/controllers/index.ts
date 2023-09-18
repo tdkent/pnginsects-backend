@@ -41,7 +41,6 @@ const fetchImages: RequestHandler<{ name: string }> = async (req, res, next) => 
         res.next_cursor ? (nextCursorStr = res.next_cursor) : (nextCursorStr = "");
         resources = [...res.resources];
         numberOfCalls++;
-        console.log("resourced returned: ", res.resources.length);
         return res;
       });
 
@@ -60,7 +59,6 @@ const fetchImages: RequestHandler<{ name: string }> = async (req, res, next) => 
           res.next_cursor ? (nextCursorStr = res.next_cursor) : (nextCursorStr = "");
           resources = [...resources, ...res.resources];
           numberOfCalls++;
-          console.log("resourced returned: ", res.resources.length);
           return res;
         });
     }
@@ -80,7 +78,7 @@ const fetchImages: RequestHandler<{ name: string }> = async (req, res, next) => 
       };
     });
 
-    console.log("number of calls: ", numberOfCalls);
+    console.log("this function has updated", resources.length);
 
     res.json({
       sections,
