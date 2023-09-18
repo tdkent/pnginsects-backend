@@ -41,7 +41,8 @@ const fetchImages: RequestHandler<{ name: string }> = async (req, res, next) => 
         res.next_cursor ? (nextCursorStr = res.next_cursor) : (nextCursorStr = "");
         resources = [...res.resources];
         numberOfCalls++;
-        console.log(res.rate_limit_remaining);
+        console.log("rate limit remaining: ", res.rate_limit_remaining);
+        console.log("resourced returned: ", res.resources.length);
         return res;
       });
 
@@ -60,7 +61,8 @@ const fetchImages: RequestHandler<{ name: string }> = async (req, res, next) => 
           res.next_cursor ? (nextCursorStr = res.next_cursor) : (nextCursorStr = "");
           resources = [...resources, ...res.resources];
           numberOfCalls++;
-          console.log(res.rate_limit_remaining);
+          console.log("rate limit remaining: ", res.rate_limit_remaining);
+          console.log("resourced returned: ", res.resources.length);
           return res;
         });
     }
@@ -78,6 +80,9 @@ const fetchImages: RequestHandler<{ name: string }> = async (req, res, next) => 
         images: addCaptions.filter(({ folder }) => extractSectionName(folder) === section),
       };
     });
+
+    console.log("number of calls: ", numberOfCalls);
+    console.log("filteredData length: ", filteredData.length);
 
     res.json({
       sections,
