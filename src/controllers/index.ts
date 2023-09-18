@@ -41,7 +41,6 @@ const fetchImages: RequestHandler<{ name: string }> = async (req, res, next) => 
         res.next_cursor ? (nextCursorStr = res.next_cursor) : (nextCursorStr = "");
         resources = [...res.resources];
         numberOfCalls++;
-        console.log("rate limit remaining: ", res.rate_limit_remaining);
         console.log("resourced returned: ", res.resources.length);
         return res;
       });
@@ -61,7 +60,6 @@ const fetchImages: RequestHandler<{ name: string }> = async (req, res, next) => 
           res.next_cursor ? (nextCursorStr = res.next_cursor) : (nextCursorStr = "");
           resources = [...resources, ...res.resources];
           numberOfCalls++;
-          console.log("rate limit remaining: ", res.rate_limit_remaining);
           console.log("resourced returned: ", res.resources.length);
           return res;
         });
@@ -72,7 +70,8 @@ const fetchImages: RequestHandler<{ name: string }> = async (req, res, next) => 
     const sections: string[] = [...new Set(folders)];
     // extract sections
     const addCaptions = extractCaptions(resources);
-
+    // count resources
+    const count = resources.length;
     // create data array
     const filteredData = sections.map((section) => {
       return {
@@ -82,11 +81,11 @@ const fetchImages: RequestHandler<{ name: string }> = async (req, res, next) => 
     });
 
     console.log("number of calls: ", numberOfCalls);
-    console.log("filteredData length: ", filteredData.length);
 
     res.json({
       sections,
       resources: filteredData,
+      count,
     });
   } catch (error) {
     console.log(error);
