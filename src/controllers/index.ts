@@ -68,8 +68,6 @@ const fetchImages: RequestHandler<{ name: string }> = async (req, res, next) => 
     const sections: string[] = [...new Set(folders)];
     // extract sections
     const addCaptions = extractCaptions(resources);
-    // count resources
-    const count = resources.length;
     // create data array
     const filteredData = sections.map((section) => {
       return {
@@ -78,12 +76,9 @@ const fetchImages: RequestHandler<{ name: string }> = async (req, res, next) => 
       };
     });
 
-    console.log("this function has updated", resources.length);
-
     res.json({
       sections,
       resources: filteredData,
-      count,
     });
   } catch (error) {
     console.log(error);
