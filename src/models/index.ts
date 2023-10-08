@@ -30,6 +30,10 @@ export interface CloudinaryResource {
   secure_url: string;
 }
 
+export interface CaptionedResource extends CloudinaryResource {
+  caption: string;
+}
+
 export interface CloudinaryResources {
   resources: CloudinaryResource[];
   rate_limit_allowed: number;

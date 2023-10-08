@@ -1,4 +1,4 @@
-import { CloudinaryResource } from "@models";
+import { CaptionedResource, CloudinaryResource } from "@models";
 
 export const extractSectionName = (folder: string) => folder.split("/")[1];
 
@@ -26,8 +26,27 @@ export const extractCaptions = (resources: CloudinaryResource[]) => {
       // if the copy number is 9 or less, this will remove ' (x)'
       // if the copy number is 10 or greater, this will remove '(xx)'
       // in this case we can use trim() to remove the trailing space
-      if (filteredString.match(regex)) filteredString = filteredString.slice(0, -4);
+      if (filteredString.match(regex))
+        filteredString = filteredString.slice(0, -4);
+      // add line break tag if caption includes a common name
+      const commonNameHyphen = " - ";
+      if (filteredString.includes(commonNameHyphen)) {
+        filteredString =
+          filteredString.split(commonNameHyphen)[0] +
+          "<br />" +
+          filteredString.split(commonNameHyphen)[1];
+      }
     }
     return { ...img, caption: filteredString.trim() };
   });
+};
+
+export const sortImages = (resources: CaptionedResource[]) => {
+  const sortCaptionedImages = resources
+    .filter((img) => img.caption)
+    .sort((a, b) => a.caption.localeCompare(b.caption));
+  const sortOtherImages = resources
+    .filter((img) => !img.caption)
+    .sort((a, b) => a.caption.localeCompare(b.caption));
+  return sortCaptionedImages.concat(sortOtherImages);
 };

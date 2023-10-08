@@ -3,8 +3,12 @@ import { validationResult } from "express-validator";
 import cloudinary from "cloudinary";
 
 import { cloudinaryName, cloudinaryKey, cloudinarySecret } from "@configs";
-import { extractSectionName, extractCaptions } from "@utils";
-import { CloudinaryResources, CloudinaryResource } from "@models";
+import { extractSectionName, extractCaptions, sortImages } from "@utils";
+import {
+  CloudinaryResources,
+  CloudinaryResource,
+  CaptionedResource,
+} from "@models";
 
 import { Errors } from "../models";
 
@@ -15,7 +19,11 @@ cloudinary.v2.config({
   secure: true,
 });
 
-const fetchImages: RequestHandler<{ name: string }> = async (req, res, next) => {
+const fetchImages: RequestHandler<{ name: string }> = async (
+  req,
+  res,
+  next
+) => {
   const { name } = req.params;
   try {
     // validation errors
@@ -38,7 +46,9 @@ const fetchImages: RequestHandler<{ name: string }> = async (req, res, next) => 
         max_results: 500,
       })
       .then((res: CloudinaryResources) => {
-        res.next_cursor ? (nextCursorStr = res.next_cursor) : (nextCursorStr = "");
+        res.next_cursor
+          ? (nextCursorStr = res.next_cursor)
+          : (nextCursorStr = "");
         resources = [...res.resources];
         numberOfCalls++;
         return res;
@@ -56,7 +66,9 @@ const fetchImages: RequestHandler<{ name: string }> = async (req, res, next) => 
           next_cursor: nextCursorStr,
         })
         .then((res: CloudinaryResources) => {
-          res.next_cursor ? (nextCursorStr = res.next_cursor) : (nextCursorStr = "");
+          res.next_cursor
+            ? (nextCursorStr = res.next_cursor)
+            : (nextCursorStr = "");
           resources = [...resources, ...res.resources];
           numberOfCalls++;
           return res;
@@ -67,12 +79,16 @@ const fetchImages: RequestHandler<{ name: string }> = async (req, res, next) => 
     const folders = resources.map(({ folder }) => extractSectionName(folder));
     const sections: string[] = [...new Set(folders)];
     // extract sections
-    const addCaptions = extractCaptions(resources);
+    const addCaptions: CaptionedResource[] = extractCaptions(resources);
+    // sort by caption or public id
+    const sortedData = sortImages(addCaptions);
     // create data array
     const filteredData = sections.map((section) => {
       return {
         sectionName: section,
-        images: addCaptions.filter(({ folder }) => extractSectionName(folder) === section),
+        images: sortedData.filter(
+          ({ folder }) => extractSectionName(folder) === section
+        ),
       };
     });
 
